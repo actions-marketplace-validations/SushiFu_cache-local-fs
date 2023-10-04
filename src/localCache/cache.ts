@@ -174,10 +174,8 @@ export async function saveCache(
     }
 
     const archiveFolder = await utils.createTempDirectory();
-    const archivePath = path.join(
-        archiveFolder,
-        utils.getCacheFileName(compressionMethod)
-    );
+    const cacheFileName = utils.getCacheFileName(compressionMethod);
+    const archivePath = path.join(archiveFolder, cacheFileName);
 
     core.debug(`Archive Path: ${archivePath}`);
 
@@ -192,7 +190,7 @@ export async function saveCache(
         core.debug(`Saving Cache (Key: ${key})`);
 
         const cacheStorePath = utils.getCacheStorePath(cacheBasePath, key);
-        await utils.storeCacheFile(archivePath, cacheStorePath);
+        await utils.storeCacheFile(archivePath, cacheStorePath, cacheFileName);
 
         return true;
     } catch (error) {

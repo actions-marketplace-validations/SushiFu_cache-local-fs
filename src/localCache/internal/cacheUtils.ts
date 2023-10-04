@@ -157,10 +157,18 @@ export function getCacheStorePath(
 
 export async function storeCacheFile(
     archivePath: string,
-    cacheStorePath: string
+    cacheStorePath: string,
+    cacheFileName: string
 ) {
-    await io.mkdirP(cacheStorePath);
-    await io.cp(archivePath, cacheStorePath, {
-        force: true
+    await fs.promises.mkdir(cacheStorePath, {
+        recursive: true,
+        mode: fs.constants.S_IRWXU | fs.constants.S_IRWXG
     });
+    await io.cp(archivePath, cacheStorePath, { force: true });
+    const rw =
+        fs.constants.S_IRUSR |
+        fs.constants.S_IWUSR |
+        fs.constants.S_IRGRP |
+        fs.constants.S_IWGRP;
+    await fs.promises.chmod(path.join(cacheStorePath, cacheFileName), rw);
 }

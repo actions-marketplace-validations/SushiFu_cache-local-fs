@@ -1,32 +1,32 @@
-name: 'github-action-cache-local-fs'
-description: 'Cache artifacts like dependencies and build outputs inside a local filesystem in self-hosted runner environments'
-author: 'khj809'
+name: "cache-local-fs"
+description: "Cache artifacts like dependencies and build outputs inside a local filesystem in self-hosted runner environments"
+author: "SushiFu"
 inputs:
   path:
-    description: 'A list of files, directories, and wildcard patterns to cache and restore'
+    description: "A list of files, directories, and wildcard patterns to cache and restore"
     required: true
   key:
-    description: 'An explicit key for restoring and saving the cache'
+    description: "An explicit key for restoring and saving the cache"
     required: true
   restore-keys:
-    description: 'An ordered list of keys to use for restoring stale cache if no cache hit occurred for key. Note `cache-hit` returns false in this case.'
+    description: "An ordered list of keys to use for restoring stale cache if no cache hit occurred for key. Note `cache-hit` returns false in this case."
     required: false
   cache-base-path:
-    description: 'A base local filesystem path where cached files are stored.'
-    default: '/tmp/cache'
+    description: "A base local filesystem path where cached files are stored."
+    default: "/tmp/cache"
     required: false
   fail-on-cache-miss:
-    description: 'Fail the workflow if cache entry is not found'
-    default: 'false'
+    description: "Fail the workflow if cache entry is not found"
+    default: "false"
     required: false
 outputs:
   cache-hit:
-    description: 'A boolean value to indicate an exact match was found for the primary key'
+    description: "A boolean value to indicate an exact match was found for the primary key"
 runs:
-  using: 'node16'
-  main: 'dist/restore/index.js'
-  post: 'dist/save/index.js'
+  using: "node16"
+  main: "dist/restore/index.js"
+  post: "dist/save/index.js"
   post-if: success()
 branding:
-  icon: 'archive'
-  color: 'gray-dark'
+  icon: "archive"
+  color: "gray-dark"

@@ -5885,7 +5885,8 @@ function saveCache(paths, key, cacheBasePath) {
             throw new Error(`Path Validation Error: Path(s) specified in the action for caching do(es) not exist, hence no cache is being saved.`);
         }
         const archiveFolder = yield utils.createTempDirectory();
-        const archivePath = path.join(archiveFolder, utils.getCacheFileName(compressionMethod));
+        const cacheFileName = utils.getCacheFileName(compressionMethod);
+        const archivePath = path.join(archiveFolder, cacheFileName);
         core.debug(`Archive Path: ${archivePath}`);
         try {
             yield (0, tar_1.createTar)(archiveFolder, cachePaths, compressionMethod);
@@ -5896,7 +5897,7 @@ function saveCache(paths, key, cacheBasePath) {
             core.debug(`File Size: ${archiveFileSize}`);
             core.debug(`Saving Cache (Key: ${key})`);
             const cacheStorePath = utils.getCacheStorePath(cacheBasePath, key);
-            yield utils.storeCacheFile(archivePath, cacheStorePath);
+            yield utils.storeCacheFile(archivePath, cacheStorePath, cacheFileName);
             return true;
         }
         catch (error) {
@@ -8493,12 +8494,18 @@ function getCacheStorePath(cacheBasePath, cacheKey) {
     return path.join(cacheBasePath || constants_1.DefaultCacheBasePath, process.env.GITHUB_REPOSITORY || "", cacheKey);
 }
 exports.getCacheStorePath = getCacheStorePath;
-function storeCacheFile(archivePath, cacheStorePath) {
+function storeCacheFile(archivePath, cacheStorePath, cacheFileName) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield io.mkdirP(cacheStorePath);
-        yield io.cp(archivePath, cacheStorePath, {
-            force: true
+        yield fs.promises.mkdir(cacheStorePath, {
+            recursive: true,
+            mode: fs.constants.S_IRWXU | fs.constants.S_IRWXG
         });
+        yield io.cp(archivePath, cacheStorePath, { force: true });
+        const rw = fs.constants.S_IRUSR |
+            fs.constants.S_IWUSR |
+            fs.constants.S_IRGRP |
+            fs.constants.S_IWGRP;
+        yield fs.promises.chmod(path.join(cacheStorePath, cacheFileName), rw);
     });
 }
 exports.storeCacheFile = storeCacheFile;
